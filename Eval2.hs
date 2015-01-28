@@ -3,11 +3,13 @@ module Eval2 where
 import Syntax
 import EvalTypes
 
+import Control.Applicative
 import Control.Monad.State
 import Control.Monad.Writer
 import Data.Map (Map)
 import qualified Data.Map as Map
 import Text.PrettyPrint
+import qualified Debug.Trace
 
 -- -----------------------------------------------------------------------------
 
@@ -56,8 +58,10 @@ eval ccs (EPlus e1 e2) = do
    return (ccs, EInt (x+y))
 
 eval ccs (EApp f x) = do
-   (lam_ccs, ELam y e) <- eval ccs f
-   eval lam_ccs (subst y x e)
+   (lam_ccs, e) <- eval ccs f
+   ELam y e' <- renameBound e Map.empty
+   trace ("Lam: " ++ show e ++ "\n" ++ show (ELam y e'))
+   eval lam_ccs (subst y x e')
 
 eval ccs (EPush cc e) =
    eval (pushCC cc ccs) e
@@ -142,3 +146,27 @@ isVal (ELam _ _) = True
 isVal (EInt _)   = True
 isVal _          = False
 
+renameBound :: Expr -> Map Var Var -> E Expr
+renameBound (EVar x) m =
+  return (EVar (Map.findWithDefault x x m))
+renameBound (ELam x e) m = do
+  x' <- freshen x
+  let m' = Map.insert x x' m
+  ELam x' <$> renameBound e m'
+renameBound (ELet (x,e) body) m = do
+  e' <- renameBound e m
+  x' <- freshen x
+  let m' = Map.insert x x' m
+  ELet (x',e') <$> renameBound body m'
+renameBound (EPlus l r) m =
+  EPlus <$> renameBound l m <*> renameBound r m
+renameBound (EApp e x) m =
+  EApp <$> renameBound e m <*> pure (Map.findWithDefault x x m)
+renameBound (EPush l e) m =
+  EPush l <$> renameBound e m
+renameBound other m = return other
+
+freshen :: Var -> E Var
+freshen x = do
+  j <- genSym
+  return (takeWhile (/= '_') x ++ '_':show j)
