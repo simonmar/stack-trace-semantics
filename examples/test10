@@ -1,0 +1,42 @@
+c = 21;
+double = push double \x. x + x;
+
+-- Same as test9, but we boxed the j argument to h:
+
+g = push g 
+    let j = \x. double x in
+    \h. push g1 (let j1 = j in h j1);
+
+main = 
+   push main 
+   let h = \f. f c in 
+   \x1. push main1 g h;
+
+-- now we get the correct answer (with Eval1)
+
+-- should be:
+--    <TOP,main,main1,g,double> = 1
+
+-- TRACE:
+
+-- Heap closure for x, CCS = <TOP>
+-- Eval: main
+-- Heap closure for h, CCS = <CAF,main>
+-- Update: main, CCS = <CAF,main>
+-- Call: main, cur CCS = <TOP>, call CCS = <TOP,main>
+-- Eval: g
+-- Heap closure for j, CCS = <CAF,g>
+-- Update: g, CCS = <CAF,g>
+-- Call: g, cur CCS = <TOP,main,main1>, call CCS = <TOP,main,main1,g>
+-- Heap closure for j1, CCS = <TOP,main,main1,g,g1>
+-- Call: h, cur CCS = <TOP,main,main1,g,g1>, call CCS = <TOP,main>
+-- Eval: j1
+-- Call: j, cur CCS = <TOP,main,main1,g,g1>, call CCS = <TOP,main,main1,g>
+-- Update: j1, CCS = <TOP,main,main1,g>
+--    *** Boxing j1 has had the effect of capturing the CCS at the call site
+--    *** of g, and prepending it to j, which is what we wanted.
+-- Call: j1, cur CCS = <TOP,main>, call CCS = <TOP,main,main1,g>
+-- Eval: double
+-- Update: double, CCS = <CAF,double>
+-- Call: double, cur CCS = <TOP,main,main1,g>, call CCS = <TOP,main,main1,g,double>
+

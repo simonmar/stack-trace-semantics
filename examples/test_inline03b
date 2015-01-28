@@ -1,0 +1,10 @@
+-- This example distinguishes eval1, eval{2,3}, eval4
+
+main = push main
+       \z.
+           push main2
+               let
+                   g = push g push f \x . x+x
+               in
+               push main3
+                   g z;

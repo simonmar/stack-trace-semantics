@@ -1,0 +1,4 @@
+f = push f \x . x+x;
+
+main = \x. let y = 1 in f y;
+

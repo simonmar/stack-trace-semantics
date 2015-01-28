@@ -1,0 +1,26 @@
+-- An example that tries to demonstrate funny business.  The 'f'
+-- function will escape its context by being stored in the data
+-- structure.  We are trying to find an example where it matters
+-- whether the binding for 'f' is inside or outside the push 'g'.
+--
+-- Unfortunately this one doesn't work (or rather, it works fine, but
+-- doesn't demonstrate a problem.  Again, eval4 is the only semantics
+-- that works here.
+
+-- A data structure encoded as a function (actually a 1-tuple)
+cons = \a. \j. j a;
+
+h =
+  push h
+  let
+    f = push f \x . x+x
+  in
+    push g
+    cons f;
+
+main = \z.
+  push main
+  let
+     alt = \g . g z
+  in
+     h alt;

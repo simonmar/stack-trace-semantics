@@ -1,0 +1,16 @@
+c = 21;
+double = push double \x. x + x;
+
+g = push g \h. let
+                j = push j \x. double x
+              in
+                push g1 (h j);
+
+main = \x1. push main
+            let
+               h = \f. push main2 (f c)
+            in
+               push main1 g h;
+
+-- should be:
+--    <TOP,main,main1,g,j,double> = 1

@@ -1,0 +1,7 @@
+f = \y . push f (y + y);
+
+apply = \f . \x . push apply (f x);
+
+main = \x . push main
+            let f' = f in
+            apply f' x;

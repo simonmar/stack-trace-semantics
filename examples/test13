@@ -1,0 +1,21 @@
+c = 21;
+double = push double \x. x + x;
+
+foo = push foo \x . x;
+
+compose = \f. \g. \x. let z = g x in f z;
+
+f = push f compose foo double;
+
+main = 
+   push main 
+    \x. f c;
+
+
+-- 1       : <TOP,main,f,double> = 1
+-- 2       : <TOP,main,f,double> = 1
+-- 3       : <TOP,main,double> = 1
+--
+-- 3 is different due to evaluation scoping: the "push f" scopes over
+-- "compose foo double", which evaluates to a function, it does not
+-- enclose the *call* to double.

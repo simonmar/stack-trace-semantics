@@ -1,0 +1,48 @@
+c = 21;
+double = push double \x. x + x;
+
+constr = push pair \x. \f. f x;
+deconstr = \p. let f = \x. x in p f;
+
+g = push g
+    let j = \x. double x in
+    let p = constr j in
+    \h. push g1 let p1 = p in h p1;
+
+main = 
+   push main 
+    let h = \p. deconstr p c in
+    \x. push main1 g h;
+
+-- This one goes wrong, even with boxing of the higher order args.
+
+-- result (eval):
+-- Heap closure for x, CCS = <TOP>
+-- Eval: main
+-- Heap closure for h, CCS = <CAF,main>
+-- Update: main, CCS = <CAF,main>
+-- Call: main, cur CCS = <TOP>, call CCS = <TOP,main>
+-- Eval: g
+-- Heap closure for j, CCS = <CAF,g>
+-- Heap closure for p, CCS = <CAF,g>
+-- Update: g, CCS = <CAF,g>
+-- Call: g, cur CCS = <TOP,main,main1>, call CCS = <TOP,main,main1,g>
+-- Heap closure for p1, CCS = <TOP,main,main1,g,g1>
+-- Call: h, cur CCS = <TOP,main,main1,g,g1>, call CCS = <TOP,main>
+-- Call: deconstr, cur CCS = <TOP,main>, call CCS = <TOP,main>
+-- Heap closure for f, CCS = <TOP,main>
+-- Eval: p1
+-- Eval: p
+-- Eval: constr
+-- Update: constr, CCS = <CAF,pair>
+-- Call: constr, cur CCS = <CAF,g>, call CCS = <CAF,g,pair>
+-- Update: p, CCS = <CAF,g,pair>
+-- Call: p, cur CCS = <TOP,main,main1,g,g1>, call CCS = <TOP,main,main1,g,pair>
+-- Update: p1, CCS = <TOP,main,main1,g,pair>
+-- Call: p1, cur CCS = <TOP,main>, call CCS = <TOP,main,main1,g,pair>
+-- Call: f, cur CCS = <TOP,main,main1,g,pair>, call CCS = <TOP,main>
+-- Call: j, cur CCS = <TOP,main>, call CCS = <TOP,main,g>
+-- Eval: double
+-- Update: double, CCS = <CAF,double>
+-- Call: double, cur CCS = <TOP,main,g>, call CCS = <TOP,main,g,double>
+-- 42

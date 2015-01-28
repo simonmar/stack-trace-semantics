@@ -1,0 +1,5 @@
+-- inline a local function
+
+main = \z. push main
+                   push main2 (push f (z + z));
+

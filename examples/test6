@@ -1,0 +1,12 @@
+c = 21;
+double = push double \x. x + x;
+
+f = push f \x2. x2 c;
+
+-- double costs should be attributed to g
+g = push g let z = \x3. double x3 in f z;
+
+main = \x1. push main g;
+
+-- should be:
+--	<CAF,g,double> = 1

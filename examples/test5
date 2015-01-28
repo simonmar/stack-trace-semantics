@@ -1,0 +1,15 @@
+c = 21;
+double = push double \x. x + x;
+
+f = \x . double x;
+
+-- costs for z are attributed to <CAF,g> whereas
+-- costs for applying f are attributed to <g's caller, ..., g>
+g = push g let z = double c in \x. f x + z;
+
+main = \x. push main (g c);
+
+-- should be:
+--	<CAF,g,double> = 1
+--	<TOP,main,g,double> = 1
+--	<TOP,main,g> = 1

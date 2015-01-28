@@ -1,0 +1,8 @@
+-- inline a local function
+
+main = \z. push main
+               let
+                   f = push f \x . x+x
+               in
+                   push main2 f z;
+

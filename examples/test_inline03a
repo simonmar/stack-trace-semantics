@@ -1,0 +1,15 @@
+-- This example distinguishes eval1, eval{2,3}, eval4
+-- eval4 is the only semantics that gives the same stack after f is
+-- inlined.
+
+main = push main
+       let
+          f = push f \x . x+x
+       in
+       \z.
+           push main2
+               let
+                   g = push g f
+               in
+               push main3
+                   g z;

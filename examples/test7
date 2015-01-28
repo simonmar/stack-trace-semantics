@@ -1,0 +1,9 @@
+c = 21;
+double = push double \x. x + x;
+
+g = push g let z = push z \x3. double x3 in z;
+
+main = \x1. push main (g c);
+
+-- should be:
+--	<TOP,main,g,z,double> = 1

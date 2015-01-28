@@ -1,0 +1,13 @@
+-- Boxing (e => let x' = x in e[x'/x]) should be a no-op.
+--
+-- The boxing transformation was required in Sansom's lexical
+-- semantics to get the desired behaviour for higher-order function
+-- arguments.
+
+f = \y . push f (y + y);
+
+apply = \f . \x . push apply (f x);
+
+main = \x . push main
+            -- let f' = f in apply f' x;
+            apply f x;

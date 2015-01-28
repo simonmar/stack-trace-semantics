@@ -1,0 +1,39 @@
+c = 21;
+double = push double \x. x + x;
+
+g = push g 
+    let j = \x. double x in
+    \h. push g1 (h j);
+
+main = 
+   push main 
+   let h = \f. f c in
+   \x1. push main1 g h;
+
+-- ** WRONG **
+-- should be:
+--    <TOP,main,main1,g,double> = 1
+-- but is really:
+--    <TOP,main,g,double> = 1
+
+-- TRACE:
+-- 
+-- Heap closure for x, CCS = <TOP>
+-- Eval: main
+-- Heap closure for h, CCS = <CAF,main>
+-- Update: main, CCS = <CAF,main>
+-- Call: main, cur CCS = <TOP>, call CCS = <TOP,main>
+-- Eval: g
+-- Heap closure for j, CCS = <CAF,g>
+-- Update: g, CCS = <CAF,g>
+-- Call: g, cur CCS = <TOP,main,main1>, call CCS = <TOP,main,main1,g>
+-- Call: h, cur CCS = <TOP,main,main1,g>, call CCS = <TOP,main>
+--    *** CCS has been truncated.  Is this right? Arguably yes, we have made a
+--    *** recursive call to main.
+-- Call: j, cur CCS = <TOP,main>, call CCS = <TOP,main,g>
+--    *** Here's the problem: invoking j should have appended <main1,g> 
+--    *** not just <g>.  We can get this behaviour by boxing j.
+-- Eval: double
+-- Update: double, CCS = <CAF,double>
+-- Call: double, cur CCS = <TOP,main,g>, call CCS = <TOP,main,g,double>
+

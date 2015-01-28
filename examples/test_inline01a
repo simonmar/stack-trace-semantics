@@ -1,0 +1,5 @@
+-- inline a top-level function
+
+f = push f \x . x+x;
+
+main = \z. push main f z;

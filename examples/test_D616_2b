@@ -1,0 +1,10 @@
+c = 42;
+
+f = push f \x . \y . x + x;
+
+g = \x . push g float;
+
+float = f c;
+
+main = push main \x. g x x;
+

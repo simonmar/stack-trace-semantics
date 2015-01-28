@@ -1,0 +1,51 @@
+-- Do enough boxing, and you can fix test12 (see g)
+
+c = 21;
+double   = push double \x. x + x;
+
+constr = push pair \x. \f. f x;
+deconstr = \p. let f = \x. x in p f;
+
+g = push g 
+    let j = \x. double x in
+    let p = \j. constr j in
+    \h. push g1 let j1 = j in let p1 = p j1 in h p1;
+
+main = 
+   push main 
+    let h = \p. deconstr p c in
+    \x. push main1 g h;
+
+-- result (eval):
+-- Heap closure for x, CCS = <TOP>
+-- Eval: main
+-- Heap closure for h, CCS = <CAF,main>
+-- Update: main, CCS = <CAF,main>
+-- Call: main, cur CCS = <TOP>, call CCS = <TOP,main>
+-- Eval: g
+-- Heap closure for j, CCS = <CAF,g>
+-- Heap closure for p, CCS = <CAF,g>
+-- Update: g, CCS = <CAF,g>
+-- Call: g, cur CCS = <TOP,main,main1>, call CCS = <TOP,main,main1,g>
+-- Heap closure for j1, CCS = <TOP,main,main1,g,g1>
+-- Heap closure for p1, CCS = <TOP,main,main1,g,g1>
+-- Call: h, cur CCS = <TOP,main,main1,g,g1>, call CCS = <TOP,main>
+-- Call: deconstr, cur CCS = <TOP,main>, call CCS = <TOP,main>
+-- Heap closure for f, CCS = <TOP,main>
+-- Eval: p1
+-- Call: p, cur CCS = <TOP,main,main1,g,g1>, call CCS = <TOP,main,main1,g>
+-- Call: constr, cur CCS = <TOP,main,main1,g>, call CCS = <TOP,main,main1,g>
+-- Update: p1, CCS = <TOP,main,main1,g>
+-- Call: p1, cur CCS = <TOP,main>, call CCS = <TOP,main,main1,g>
+-- Call: f, cur CCS = <TOP,main,main1,g>, call CCS = <TOP,main>
+-- Eval: j1
+-- Call: j, cur CCS = <TOP,main,main1,g,g1>, call CCS = <TOP,main,main1,g>
+-- Update: j1, CCS = <TOP,main,main1,g>
+-- Call: j1, cur CCS = <TOP,main>, call CCS = <TOP,main,main1,g>
+-- Eval: double
+-- Update: double, CCS = <CAF,double>
+-- Call: double, cur CCS = <TOP,main,main1,g>, call CCS = <TOP,main,main1,g,double>
+-- 42
+-- 
+-- costs (eval):
+-- <TOP,main,main1,g,double> = 1

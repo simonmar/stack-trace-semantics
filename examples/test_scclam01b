@@ -1,0 +1,5 @@
+main = \z. push main
+           let
+                f = \x . push f x + x
+           in
+                push main2 f z;

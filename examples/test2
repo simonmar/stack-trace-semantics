@@ -1,0 +1,9 @@
+c = 21;
+double = push double \x. x + x;
+
+main = \x. push main
+       let g = \x. double x in
+       push main2 (g c);
+
+-- under GHC CCS semantics, this gives
+--      <TOP,main,double> = 1

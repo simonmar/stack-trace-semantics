@@ -1,0 +1,1 @@
+main = \z. push main push f (z + z);

@@ -1,0 +1,12 @@
+c = 21;
+double = push double \x. x + x;
+
+f = \x . double x;
+
+-- g is an indirection to f, with an extra intervening push
+g = push g f;
+
+main = \x. push main (g c);
+
+-- should be:
+--      <TOP,main,g,double> = 1

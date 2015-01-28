@@ -1,0 +1,15 @@
+c = 21;
+double = push double \x. x + x;
+
+-- Same as test10, but we lifted j to the top level:
+
+j = \x. double x;
+
+g = push g 
+    \h. push g1 
+	let j1 = j in h j1;
+
+main = 
+   push main 
+   let h = \f. f c in 
+   \x1. push main1 let h1 = h in g h1;

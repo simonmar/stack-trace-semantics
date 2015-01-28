@@ -1,0 +1,9 @@
+c = 21;
+double = push double \x. x + x;
+
+f = push f1 push f2 \x. double x;
+
+main = \x. push main (f c);
+
+-- should be:
+--       <TOP,main,f1,f2,double> = 1
